@@ -54,7 +54,9 @@ RUN go install github.com/onsi/ginkgo/v2/ginkgo@v2.17.1
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 RUN install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-VOLUME /local-code
+ADD scripts/create_kubectl.sh /
+RUN chmod +x /create_kubectl.sh
+
 VOLUME /kubeconfig
 
-#CMD /service.test -ginkgo.v --ginkgo.fail-fast --ginkgo.focus="\[ebs-csi-e2e\] \[single-az\]" --ginkgo.skip="\[modify-volume\]"
+CMD /create_kubectl.sh ; ginkgo --no-color -v --timeout 2h --fail-on-pending /service.test -- --kubeconfig=/root/.kube/config --cluster-name=$CLUSTER_NAME --aws-region=$AWS_REGION --aws-vpc-id=$AWS_VPC_ID --test-image-registry=$IMAGE_REGISTRY --ip-family=ipv4 --ec2-endpoint=$AWS_EC2_ENDPOINT --elb-endpoint=$AWS_ELB_ENDPOINT
