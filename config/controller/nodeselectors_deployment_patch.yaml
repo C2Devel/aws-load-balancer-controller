@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: controller
 spec:
+  replicas: 2
   template:
     spec:
       nodeSelector:
