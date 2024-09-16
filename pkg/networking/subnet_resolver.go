@@ -381,9 +381,10 @@ func (r *defaultSubnetsResolver) validateSubnetsMinimalCount(subnets []*ec2sdk.S
 // computeSubnetsMinimalCount returns the minimal count requirement for subnets.
 func (r *defaultSubnetsResolver) computeSubnetsMinimalCount(subnetLocale subnetLocaleType, resolveOpts SubnetsResolveOptions) int {
 	minimalCount := 1
-	if resolveOpts.LBType == elbv2model.LoadBalancerTypeApplication && subnetLocale == subnetLocaleTypeAvailabilityZone && !resolveOpts.ALBSingleSubnet {
-		minimalCount = 2
-	}
+	// allow using 1 subnet for 1 az installations
+	//if resolveOpts.LBType == elbv2model.LoadBalancerTypeApplication && subnetLocale == subnetLocaleTypeAvailabilityZone && !resolveOpts.ALBSingleSubnet {
+	//	minimalCount = 2
+	//}
 	return minimalCount
 }
 
