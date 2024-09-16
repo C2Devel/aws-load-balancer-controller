@@ -1,8 +1,8 @@
 
 MAKEFILE_PATH = $(dir $(realpath -s $(firstword $(MAKEFILE_LIST))))
 
-VERSION ?= v2.7.0-TEST
-REGISTRY ?= registry.cloud.croc.ru/achernev
+VERSION ?= v2.7.0-ROCKIT1
+REGISTRY ?= registry.cloud.croc.ru/kaas
 RELEASE_REGISTRIES ?= $(REGISTRY)
 IMAGE_NAME ?= aws-load-balancer-controller
 
