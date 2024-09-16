@@ -238,5 +238,16 @@ docker-run-unit-test:
 		--mount type=bind,source=./,target=/local-code \
 		$(IMG)-unit-test
 
+# Run the e2e using docker
+docker-run-e2e-test:
+	docker run --rm -it \
+		--platform=${IMG_PLATFORM} \
+		--mount type=bind,source=$(KUBECONFIG_FILE),target=/kubeconfig \
+		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+		-e AWS_ENDPOINT_UNSECURE=$(AWS_ENDPOINT_UNSECURE) \
+		$(IMG)-e2e-test \
+		/bin/bash
+
 e2e-test:
 	./scripts/ci_e2e_test.sh
