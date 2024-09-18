@@ -1,14 +1,19 @@
 
 MAKEFILE_PATH = $(dir $(realpath -s $(firstword $(MAKEFILE_LIST))))
 
+VERSION ?= v2.7.0-ROCKIT1
+REGISTRY ?= registry.cloud.croc.ru/kaas
+RELEASE_REGISTRIES ?= $(REGISTRY)
+IMAGE_NAME ?= aws-load-balancer-controller
+
 # Image URL to use all building/pushing image targets
-IMG ?= public.ecr.aws/eks/aws-load-balancer-controller:v2.7.0
+IMG ?= $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
 # Image URL to use for builder stage in Docker build
 GOLANG_VERSION ?= $(shell cat .go-version)
 BUILD_IMAGE ?= public.ecr.aws/docker/library/golang:$(GOLANG_VERSION)
 # Image URL to use for base layer in Docker build
 BASE_IMAGE ?= public.ecr.aws/eks-distro-build-tooling/eks-distro-minimal-base-nonroot:2023-09-06-1694026927.2
-IMG_PLATFORM ?= linux/amd64,linux/arm64
+IMG_PLATFORM ?= linux/amd64
 # ECR doesn't appear to support SPDX SBOM
 IMG_SBOM ?= none
 
@@ -55,6 +60,11 @@ deploy: manifests
 	cd config/controller && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
+# Create k_bundle with manifests
+create-bundle:
+	cd config/controller && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default > config/k_bundle.yaml
+
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen kustomize
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=controller-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
@@ -99,10 +109,18 @@ aws-load-balancer-controller-push: ko
     BUILD_DATE=$(shell date +%Y-%m-%dT%H:%M:%S%z) \
     ko build --tags $(word 2,$(subst :, ,${IMG})) --platform=${IMG_PLATFORM} --bare --sbom ${IMG_SBOM} .
 
+# Build the docker image using docker buildx
+docker-build-w-buildx:
+	docker buildx build . --target bin \
+        		--tag $(IMG) \
+				--build-arg BASE_IMAGE=$(BASE_IMAGE) \
+				--build-arg BUILD_IMAGE=$(BUILD_IMAGE) \
+        		--platform ${IMG_PLATFORM}
+
 # Push the docker image using docker buildx
 docker-push-w-buildx:
 	docker buildx build . --target bin \
-        		--tag $(IMG) \
+				$(foreach repo, $(RELEASE_REGISTRIES), -t=$(repo)/$(IMAGE_NAME):$(VERSION)) \
 				--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 				--build-arg BUILD_IMAGE=$(BUILD_IMAGE) \
 				--push \
@@ -196,6 +214,40 @@ verify-versions:
 
 unit-test:
 	./scripts/ci_unit_test.sh
+
+docker-build-unit-test:
+	docker buildx build . \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
+		--build-arg BUILD_IMAGE=$(BUILD_IMAGE) \
+		--tag $(IMG)-unit-test \
+		--platform ${IMG_PLATFORM} \
+		--target=linux-unit-test
+
+docker-build-e2e-test:
+	docker buildx build . \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
+		--build-arg BUILD_IMAGE=$(BUILD_IMAGE) \
+		--tag $(IMG)-e2e-test \
+		--platform ${IMG_PLATFORM} \
+		--target=linux-e2e-test
+
+# Run the unit-test using docker
+docker-run-unit-test:
+	docker run --rm -it \
+		--platform=${IMG_PLATFORM} \
+		--mount type=bind,source=./,target=/local-code \
+		$(IMG)-unit-test
+
+# Run the e2e using docker
+docker-run-e2e-test:
+	docker run --rm -it \
+		--platform=${IMG_PLATFORM} \
+		--mount type=bind,source=$(KUBECONFIG_FILE),target=/kubeconfig \
+		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+		-e AWS_ENDPOINT_UNSECURE=$(AWS_ENDPOINT_UNSECURE) \
+		$(IMG)-e2e-test \
+		/bin/bash
 
 e2e-test:
 	./scripts/ci_e2e_test.sh

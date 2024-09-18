@@ -25,6 +25,9 @@ RUN --mount=type=bind,target=. \
     CGO_CPPFLAGS="-D_FORTIFY_SOURCE=2" \
     CGO_LDFLAGS="-Wl,-z,relro,-z,now" \
     go build -buildmode=pie -tags 'osusergo,netgo,static_build' -ldflags="-s -w -linkmode=external -extldflags '-static-pie' -X ${VERSION_PKG}.GitVersion=${GIT_VERSION} -X ${VERSION_PKG}.GitCommit=${GIT_COMMIT} -X ${VERSION_PKG}.BuildDate=${BUILD_DATE}" -mod=readonly -a -o /out/controller main.go
+RUN --mount=type=bind,target=. \
+    --mount=type=cache,target=/root/.cache/go-build \
+CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go test -c /workspace/test/e2e/service/ -o /out/ && go test -c /workspace/test/e2e/ingress/ -o /out/
 
 FROM $BASE_IMAGE as bin-unix
 
@@ -35,3 +38,25 @@ FROM bin-unix AS bin-linux
 FROM bin-unix AS bin-darwin
 
 FROM bin-${TARGETOS} as bin
+
+FROM --platform=${TARGETPLATFORM} $BUILD_IMAGE AS linux-unit-test
+
+VOLUME /local-code
+
+CMD cd /local-code && make unit-test
+
+FROM golang:1.22.3 AS linux-e2e-test
+
+COPY --from=build /out/service.test /service.test
+COPY --from=build /out/ingress.test /ingress.test
+
+RUN go install github.com/onsi/ginkgo/v2/ginkgo@v2.17.1
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+ADD scripts/create_kubectl.sh /
+RUN chmod +x /create_kubectl.sh
+
+VOLUME /kubeconfig
+
+CMD /create_kubectl.sh ; ginkgo --no-color -v --timeout 2h --fail-on-pending /service.test -- --kubeconfig=/root/.kube/config --cluster-name=$CLUSTER_NAME --aws-region=$AWS_REGION --aws-vpc-id=$AWS_VPC_ID --test-image-registry=$IMAGE_REGISTRY --ip-family=ipv4 --ec2-endpoint=$AWS_EC2_ENDPOINT --elb-endpoint=$AWS_ELB_ENDPOINT
