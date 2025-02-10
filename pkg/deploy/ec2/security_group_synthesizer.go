@@ -72,11 +72,12 @@ func (s *securityGroupSynthesizer) Synthesize(ctx context.Context) error {
 }
 
 func (s *securityGroupSynthesizer) PostSynthesize(ctx context.Context) error {
-	for _, sdkSG := range s.unmatchedSDKSGs {
-		if err := s.sgManager.Delete(ctx, sdkSG); err != nil {
-			return err
-		}
-	}
+	// Disable deletion of sg, because this also can delete the sg of another, already existed balancer
+	// for _, sdkSG := range s.unmatchedSDKSGs {
+	// 	if err := s.sgManager.Delete(ctx, sdkSG); err != nil {
+	// 		return err
+	// 	}
+	//}
 	return nil
 }
 
