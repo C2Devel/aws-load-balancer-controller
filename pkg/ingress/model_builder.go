@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
+	//awssdk "github.com/aws/aws-sdk-go/aws"
 	elbv2sdk "github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -301,8 +301,8 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 	var mergedInboundPrefixListsProvider *types.NamespacedName
 	mergedInboundPrefixLists := sets.NewString()
 
-	var mergedSSLPolicyProvider *types.NamespacedName
-	var mergedSSLPolicy *string
+	//var mergedSSLPolicyProvider *types.NamespacedName
+	//var mergedSSLPolicy *string
 
 	var mergedTLSCerts []string
 	mergedTLSCertsSet := sets.NewString()
