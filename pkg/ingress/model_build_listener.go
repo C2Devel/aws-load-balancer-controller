@@ -137,12 +137,14 @@ func (t *defaultModelBuildTask) computeIngressListenPortConfigByPort(ctx context
 			break
 		}
 	}
-	var inferredTLSCertARNs []string
+	//var inferredTLSCertARNs []string
 	if containsHTTPSPort && len(explicitTLSCertARNs) == 0 {
-		inferredTLSCertARNs, err = t.computeIngressInferredTLSCertARNs(ctx, ing.Ing)
-		if err != nil {
-			return nil, err
-		}
+		// for the current moment we cant use the certificate generation and need to provide certificates manualy by using cert-arns
+		return nil, errors.Errorf("certificate-arn with manual created certificates must be defined if using https")
+		//inferredTLSCertARNs, err = t.computeIngressInferredTLSCertARNs(ctx, ing.Ing)
+		//if err != nil {
+		//	return nil, err
+		//}
 	}
 
 	listenPortConfigByPort := make(map[int64]listenPortConfig, len(listenPorts))
@@ -155,7 +157,8 @@ func (t *defaultModelBuildTask) computeIngressListenPortConfigByPort(ctx context
 		}
 		if protocol == elbv2model.ProtocolHTTPS {
 			if len(explicitTLSCertARNs) == 0 {
-				cfg.tlsCerts = inferredTLSCertARNs
+				return nil, errors.Errorf("certificate-arn with manual created certificates must be defined if using https")
+				//cfg.tlsCerts = inferredTLSCertARNs
 			} else {
 				cfg.tlsCerts = explicitTLSCertARNs
 			}
