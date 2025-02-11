@@ -52,6 +52,7 @@ func (t *defaultModelBuildTask) buildListenerSpec(ctx context.Context, lbARN cor
 		Protocol:             config.protocol,
 		DefaultActions:       defaultActions,
 		Certificates:         certs,
+		// Our ELB doesnt support sslPolicy configuration, turn off this
 		//SSLPolicy:            config.sslPolicy,
 		MutualAuthentication: config.mutualAuthentication,
 		Tags:                 tags,

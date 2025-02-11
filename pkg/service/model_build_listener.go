@@ -64,7 +64,8 @@ func (t *defaultModelBuildTask) buildListenerSpec(ctx context.Context, port core
 	if err != nil {
 		return elbv2model.ListenerSpec{}, err
 	}
-
+	
+	// Our ELB doesnt support sslPolicy configuration, turn off this
 	//var sslPolicy *string
 	var certificates []elbv2model.Certificate
 	if listenerProtocol == elbv2model.ProtocolTLS {

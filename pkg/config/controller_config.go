@@ -122,6 +122,7 @@ func (cfg *ControllerConfig) BindFlags(fs *pflag.FlagSet) {
 		"Maximum number of concurrently running reconcile loops for targetGroupBinding")
 	fs.DurationVar(&cfg.TargetGroupBindingMaxExponentialBackoffDelay, flagTargetGroupBindingMaxExponentialBackoffDelay, defaultMaxExponentialBackoffDelay,
 		"Maximum duration of exponential backoff for targetGroupBinding reconcile failures")
+	// Our ELB doesnt support sslPolicy configuration, turn off this
 	//fs.StringVar(&cfg.DefaultSSLPolicy, flagDefaultSSLPolicy, defaultSSLPolicy,
 	//	"Default SSL policy for load balancers listeners")
 	fs.BoolVar(&cfg.EnableBackendSecurityGroup, flagEnableBackendSG, defaultEnableBackendSG,

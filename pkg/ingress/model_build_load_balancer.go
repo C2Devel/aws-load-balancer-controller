@@ -323,6 +323,7 @@ func (t *defaultModelBuildTask) buildLoadBalancerSecurityGroups(ctx context.Cont
 		}
 		t.logger.Info("SG configured via annotation", "LB SGs", lbSGTokens, "backend SG", t.backendSGIDToken)
 	}
+	// we can't use security group in our elb(alb), disable this
 	return nil, nil
 }
 

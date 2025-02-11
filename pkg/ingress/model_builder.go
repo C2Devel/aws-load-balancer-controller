@@ -342,7 +342,7 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 					*mergedInboundPrefixListsProvider, mergedInboundPrefixLists.List(), cfg.ingKey, cfgInboundPrefixLists.List())
 			}
 		}
-
+		// Our ELB doesnt support sslPolicy configuration, turn off this
 		//if cfg.listenPortConfig.sslPolicy != nil {
 		//	if mergedSSLPolicyProvider == nil {
 		//		mergedSSLPolicyProvider = &cfg.ingKey
