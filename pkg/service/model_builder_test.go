@@ -819,7 +819,6 @@ func Test_defaultModelBuilderTask_Build(t *testing.T) {
              },
              "port":83,
              "protocol":"TLS",
-             //"sslPolicy": "ELBSecurityPolicy-2016-08",
              "defaultActions":[
                 {
                    "type":"forward",
@@ -3805,7 +3804,6 @@ func Test_defaultModelBuilderTask_Build(t *testing.T) {
              },
              "port":83,
              "protocol":"TLS",
-             //"sslPolicy": "ELBSecurityPolicy-2016-08",
              "defaultActions":[
                 {
                    "type":"forward",

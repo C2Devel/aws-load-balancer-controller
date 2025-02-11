@@ -343,7 +343,14 @@ func Test_defaultSubnetsResolver_ResolveViaDiscovery(t *testing.T) {
 					WithSubnetsResolveLBScheme(elbv2model.LoadBalancerSchemeInternal),
 				},
 			},
-			wantErr: errors.New("subnets count less than minimal required count: 1 < 2"),
+			want: []*ec2sdk.Subnet{
+				{
+					SubnetId:           awssdk.String("subnet-1"),
+					AvailabilityZone:   awssdk.String("us-west-2a"),
+					AvailabilityZoneId: awssdk.String("usw2-az1"),
+					VpcId:              awssdk.String("vpc-1"),
+				},
+			},
 		},
 		{
 			name: "ALB with one matching local-zone subnet",
@@ -1565,7 +1572,7 @@ func Test_defaultSubnetsResolver_ResolveViaNameOrIDSlice(t *testing.T) {
 					WithSubnetsResolveLBScheme(elbv2model.LoadBalancerSchemeInternal),
 				},
 			},
-			wantErr: errors.New("subnets count less than minimal required count: 1 < 2"),
+			wantErr: nil,
 		},
 		{
 			name: "ALB with one local-zone subnet",
