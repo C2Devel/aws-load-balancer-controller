@@ -343,15 +343,15 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 			}
 		}
 
-		if cfg.listenPortConfig.sslPolicy != nil {
-			if mergedSSLPolicyProvider == nil {
-				mergedSSLPolicyProvider = &cfg.ingKey
-				mergedSSLPolicy = cfg.listenPortConfig.sslPolicy
-			} else if awssdk.StringValue(mergedSSLPolicy) != awssdk.StringValue(cfg.listenPortConfig.sslPolicy) {
-				return listenPortConfig{}, errors.Errorf("conflicting sslPolicy, %v: %v | %v: %v",
-					*mergedSSLPolicyProvider, awssdk.StringValue(mergedSSLPolicy), cfg.ingKey, awssdk.StringValue(cfg.listenPortConfig.sslPolicy))
-			}
-		}
+		//if cfg.listenPortConfig.sslPolicy != nil {
+		//	if mergedSSLPolicyProvider == nil {
+		//		mergedSSLPolicyProvider = &cfg.ingKey
+		//		mergedSSLPolicy = cfg.listenPortConfig.sslPolicy
+		//	} else if awssdk.StringValue(mergedSSLPolicy) != awssdk.StringValue(cfg.listenPortConfig.sslPolicy) {
+		//		return listenPortConfig{}, errors.Errorf("conflicting sslPolicy, %v: %v | %v: %v",
+		//			*mergedSSLPolicyProvider, awssdk.StringValue(mergedSSLPolicy), cfg.ingKey, awssdk.StringValue(cfg.listenPortConfig.sslPolicy))
+		//	}
+		//}
 
 		for _, cert := range cfg.listenPortConfig.tlsCerts {
 			if mergedTLSCertsSet.Has(cert) {
@@ -377,16 +377,16 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 		mergedInboundCIDRv4s.Insert("0.0.0.0/0")
 		mergedInboundCIDRv6s.Insert("::/0")
 	}
-	if mergedProtocol == elbv2model.ProtocolHTTPS && mergedSSLPolicy == nil {
-		mergedSSLPolicy = awssdk.String(t.defaultSSLPolicy)
-	}
+	//if mergedProtocol == elbv2model.ProtocolHTTPS && mergedSSLPolicy == nil {
+	//	mergedSSLPolicy = awssdk.String(t.defaultSSLPolicy)
+	//}
 
 	return listenPortConfig{
 		protocol:             mergedProtocol,
 		inboundCIDRv4s:       mergedInboundCIDRv4s.List(),
 		inboundCIDRv6s:       mergedInboundCIDRv6s.List(),
 		prefixLists:          mergedInboundPrefixLists.List(),
-		sslPolicy:            mergedSSLPolicy,
+		//sslPolicy:            mergedSSLPolicy,
 		tlsCerts:             mergedTLSCerts,
 		mutualAuthentication: mergedMtlsAttributes,
 	}, nil

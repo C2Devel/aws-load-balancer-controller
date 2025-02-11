@@ -52,7 +52,7 @@ func (t *defaultModelBuildTask) buildListenerSpec(ctx context.Context, lbARN cor
 		Protocol:             config.protocol,
 		DefaultActions:       defaultActions,
 		Certificates:         certs,
-		SSLPolicy:            config.sslPolicy,
+		//SSLPolicy:            config.sslPolicy,
 		MutualAuthentication: config.mutualAuthentication,
 		Tags:                 tags,
 	}, nil
@@ -70,8 +70,10 @@ func (t *defaultModelBuildTask) buildListenerDefaultActions(ctx context.Context,
 		}
 	}
 	if len(ingsWithDefaultBackend) == 0 {
-		action404 := t.build404Action(ctx)
-		return []elbv2model.Action{action404}, nil
+		// action404 := t.build404Action(ctx)
+		// return []elbv2model.Action{action404}, nil
+		// comment, until the ALB support 404 defaul action
+		return nil, errors.Errorf("defaultBackend must be defined, supported DefaultActions is Forward ")
 	}
 	if len(ingsWithDefaultBackend) > 1 {
 		ingKeys := make([]types.NamespacedName, 0, len(ingsWithDefaultBackend))
@@ -104,14 +106,14 @@ type listenPortConfig struct {
 	inboundCIDRv4s       []string
 	inboundCIDRv6s       []string
 	prefixLists          []string
-	sslPolicy            *string
+	//sslPolicy            *string
 	tlsCerts             []string
 	mutualAuthentication *elbv2model.MutualAuthenticationAttributes
 }
 
 func (t *defaultModelBuildTask) computeIngressListenPortConfigByPort(ctx context.Context, ing *ClassifiedIngress) (map[int64]listenPortConfig, error) {
 	explicitTLSCertARNs := t.computeIngressExplicitTLSCertARNs(ctx, ing)
-	explicitSSLPolicy := t.computeIngressExplicitSSLPolicy(ctx, ing)
+	//explicitSSLPolicy := t.computeIngressExplicitSSLPolicy(ctx, ing)
 	var prefixListIDs []string
 	t.annotationParser.ParseStringSliceAnnotation(annotations.IngressSuffixSecurityGroupPrefixLists, &prefixListIDs, ing.Ing.Annotations)
 	inboundCIDRv4s, inboundCIDRV6s, err := t.computeIngressExplicitInboundCIDRs(ctx, ing)
@@ -157,7 +159,7 @@ func (t *defaultModelBuildTask) computeIngressListenPortConfigByPort(ctx context
 			} else {
 				cfg.tlsCerts = explicitTLSCertARNs
 			}
-			cfg.sslPolicy = explicitSSLPolicy
+			//cfg.sslPolicy = explicitSSLPolicy
 			cfg.mutualAuthentication = mutualAuthenticationAttributes[port]
 		}
 		listenPortConfigByPort[port] = cfg
@@ -261,7 +263,7 @@ func (t *defaultModelBuildTask) computeIngressExplicitSSLPolicy(_ context.Contex
 	if exists := t.annotationParser.ParseStringAnnotation(annotations.IngressSuffixSSLPolicy, &rawSSLPolicy, ing.Ing.Annotations); !exists {
 		return nil
 	}
-	return &rawSSLPolicy
+	return nil
 }
 
 type MutualAuthenticationConfig struct {

@@ -1134,7 +1134,7 @@ func Test_defaultModelBuilder_Build(t *testing.T) {
 					},
 					"port": 443,
 					"protocol": "HTTPS",
-					"sslPolicy": "ELBSecurityPolicy-2016-08",
+					//"sslPolicy": "ELBSecurityPolicy-2016-08",
                     "mutualAuthentication" : {
 						"mode" : "off",
                         "trustStoreArn": ""
@@ -1628,9 +1628,9 @@ func Test_defaultModelBuilder_Build(t *testing.T) {
 						{
 							IngClassConfig: ClassConfiguration{
 								IngClassParams: &v1beta1.IngressClassParams{
-									Spec: v1beta1.IngressClassParamsSpec{
-										SSLPolicy: "ingress-class-policy",
-									},
+									//Spec: v1beta1.IngressClassParamsSpec{
+									//	SSLPolicy: "ingress-class-policy",
+									//},
 								},
 							},
 							Ing: &networking.Ingress{ObjectMeta: metav1.ObjectMeta{
@@ -1744,7 +1744,7 @@ func Test_defaultModelBuilder_Build(t *testing.T) {
 					},
 					"port": 443,
 					"protocol": "HTTPS",
-					"sslPolicy": "ingress-class-policy"
+					//"sslPolicy": "ingress-class-policy"
 				}
 			},
 			"80": null
@@ -2009,7 +2009,7 @@ func Test_defaultModelBuilder_Build(t *testing.T) {
 					},
 					"port": 443,
 					"protocol": "HTTPS",
-					"sslPolicy": "ELBSecurityPolicy-2016-08"
+					//"sslPolicy": "ELBSecurityPolicy-2016-08"
 				}
 			},
 			"80": null

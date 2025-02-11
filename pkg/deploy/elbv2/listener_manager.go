@@ -160,10 +160,10 @@ func (m *defaultListenerManager) updateSDKListenerWithSettings(ctx context.Conte
 func (m *defaultListenerManager) updateSDKListenerWithExtraCertificates(ctx context.Context, resLS *elbv2model.Listener,
 	sdkLS ListenerWithTags, isNewSDKListener bool) error {
 	// if TLS is not supported, we shouldn't update
-	if resLS.Spec.SSLPolicy == nil && sdkLS.Listener.SslPolicy == nil {
-		m.logger.V(1).Info("Res and Sdk Listener don't have SSL Policy set, skip updating extra certs for non-TLS listener.")
-		return nil
-	}
+	//if resLS.Spec.SSLPolicy == nil && sdkLS.Listener.SslPolicy == nil {
+	//	m.logger.V(1).Info("Res and Sdk Listener don't have SSL Policy set, skip updating extra certs for non-TLS listener.")
+	//	return nil
+	//}
 
 	desiredExtraCertARNs := sets.NewString()
 	_, desiredExtraCerts := buildSDKCertificates(resLS.Spec.Certificates)
@@ -261,9 +261,9 @@ func isSDKListenerSettingsDrifted(lsSpec elbv2model.ListenerSpec, sdkLS Listener
 	if !cmp.Equal(desiredDefaultCerts, sdkLS.Listener.Certificates, elbv2equality.CompareOptionForCertificates()) {
 		return true
 	}
-	if lsSpec.SSLPolicy != nil && awssdk.StringValue(lsSpec.SSLPolicy) != awssdk.StringValue(sdkLS.Listener.SslPolicy) {
-		return true
-	}
+	//if lsSpec.SSLPolicy != nil && awssdk.StringValue(lsSpec.SSLPolicy) != awssdk.StringValue(sdkLS.Listener.SslPolicy) {
+	//	return true
+	//}
 	if len(lsSpec.ALPNPolicy) != 0 && !cmp.Equal(lsSpec.ALPNPolicy, awssdk.StringValueSlice(sdkLS.Listener.AlpnPolicy), cmpopts.EquateEmpty()) {
 		return true
 	}
@@ -290,7 +290,7 @@ func buildSDKCreateListenerInput(lsSpec elbv2model.ListenerSpec, featureGates co
 	}
 	sdkObj.DefaultActions = defaultActions
 	sdkObj.Certificates, _ = buildSDKCertificates(lsSpec.Certificates)
-	sdkObj.SslPolicy = lsSpec.SSLPolicy
+	//sdkObj.SslPolicy = lsSpec.SSLPolicy
 	if len(lsSpec.ALPNPolicy) != 0 {
 		sdkObj.AlpnPolicy = awssdk.StringSlice(lsSpec.ALPNPolicy)
 	}
@@ -305,7 +305,7 @@ func buildSDKModifyListenerInput(lsSpec elbv2model.ListenerSpec, desiredDefaultA
 	sdkObj.Protocol = awssdk.String(string(lsSpec.Protocol))
 	sdkObj.DefaultActions = desiredDefaultActions
 	sdkObj.Certificates = desiredDefaultCerts
-	sdkObj.SslPolicy = lsSpec.SSLPolicy
+	//sdkObj.SslPolicy = lsSpec.SSLPolicy
 	if len(lsSpec.ALPNPolicy) != 0 {
 		sdkObj.AlpnPolicy = awssdk.StringSlice(lsSpec.ALPNPolicy)
 	}
