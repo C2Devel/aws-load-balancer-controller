@@ -142,10 +142,10 @@ func mapSDKSecurityGroupByResourceID(sdkSGs []networking.SecurityGroupInfo, reso
 	sdkSGsByID := make(map[string][]networking.SecurityGroupInfo, len(sdkSGs))
 	for _, sdkSG := range sdkSGs {
 		resourceID, ok := sdkSG.Tags[resourceIDTagKey]
-		if !ok {
-			return nil, errors.Errorf("unexpected securityGroup with no resourceID: %v", sdkSG.SecurityGroupID)
+		// add this condition because we can have multiple sgs on one vpc(for nlb/alb use)
+		if ok {
+			sdkSGsByID[resourceID] = append(sdkSGsByID[resourceID], sdkSG)
 		}
-		sdkSGsByID[resourceID] = append(sdkSGsByID[resourceID], sdkSG)
 	}
 	return sdkSGsByID, nil
 }
