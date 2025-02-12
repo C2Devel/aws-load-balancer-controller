@@ -3,7 +3,7 @@ package ec2
 import (
 	"context"
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
+	//"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
