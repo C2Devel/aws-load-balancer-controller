@@ -141,11 +141,11 @@ func mapResSecurityGroupByResourceID(resSGs []*ec2model.SecurityGroup) map[strin
 func mapSDKSecurityGroupByResourceID(sdkSGs []networking.SecurityGroupInfo, resourceIDTagKey string) (map[string][]networking.SecurityGroupInfo, error) {
 	sdkSGsByID := make(map[string][]networking.SecurityGroupInfo, len(sdkSGs))
 	for _, sdkSG := range sdkSGs {
-		resourceID, ok := sdkSG.Tags[resourceIDTagKey]
-		// add this condition because we can have multiple sgs on one vpc(for nlb/alb use)
-		if ok {
-			sdkSGsByID[resourceID] = append(sdkSGsByID[resourceID], sdkSG)
-		}
+		resourceID := sdkSG.Tags[resourceIDTagKey]
+		// remove this condition because we can have multiple sgs on one vpc(for nlb/alb use)
+		//if  !ok {
+		sdkSGsByID[resourceID] = append(sdkSGsByID[resourceID], sdkSG)
+		//}
 	}
 	return sdkSGsByID, nil
 }
