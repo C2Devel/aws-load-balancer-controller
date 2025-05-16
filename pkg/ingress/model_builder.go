@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
+	//awssdk "github.com/aws/aws-sdk-go/aws"
 	elbv2sdk "github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -301,8 +301,8 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 	var mergedInboundPrefixListsProvider *types.NamespacedName
 	mergedInboundPrefixLists := sets.NewString()
 
-	var mergedSSLPolicyProvider *types.NamespacedName
-	var mergedSSLPolicy *string
+	//var mergedSSLPolicyProvider *types.NamespacedName
+	//var mergedSSLPolicy *string
 
 	var mergedTLSCerts []string
 	mergedTLSCertsSet := sets.NewString()
@@ -342,16 +342,16 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 					*mergedInboundPrefixListsProvider, mergedInboundPrefixLists.List(), cfg.ingKey, cfgInboundPrefixLists.List())
 			}
 		}
-
-		if cfg.listenPortConfig.sslPolicy != nil {
-			if mergedSSLPolicyProvider == nil {
-				mergedSSLPolicyProvider = &cfg.ingKey
-				mergedSSLPolicy = cfg.listenPortConfig.sslPolicy
-			} else if awssdk.StringValue(mergedSSLPolicy) != awssdk.StringValue(cfg.listenPortConfig.sslPolicy) {
-				return listenPortConfig{}, errors.Errorf("conflicting sslPolicy, %v: %v | %v: %v",
-					*mergedSSLPolicyProvider, awssdk.StringValue(mergedSSLPolicy), cfg.ingKey, awssdk.StringValue(cfg.listenPortConfig.sslPolicy))
-			}
-		}
+		// Our ELB doesnt support sslPolicy configuration, turn off this
+		//if cfg.listenPortConfig.sslPolicy != nil {
+		//	if mergedSSLPolicyProvider == nil {
+		//		mergedSSLPolicyProvider = &cfg.ingKey
+		//		mergedSSLPolicy = cfg.listenPortConfig.sslPolicy
+		//	} else if awssdk.StringValue(mergedSSLPolicy) != awssdk.StringValue(cfg.listenPortConfig.sslPolicy) {
+		//		return listenPortConfig{}, errors.Errorf("conflicting sslPolicy, %v: %v | %v: %v",
+		//			*mergedSSLPolicyProvider, awssdk.StringValue(mergedSSLPolicy), cfg.ingKey, awssdk.StringValue(cfg.listenPortConfig.sslPolicy))
+		//	}
+		//}
 
 		for _, cert := range cfg.listenPortConfig.tlsCerts {
 			if mergedTLSCertsSet.Has(cert) {
@@ -377,16 +377,16 @@ func (t *defaultModelBuildTask) mergeListenPortConfigs(_ context.Context, listen
 		mergedInboundCIDRv4s.Insert("0.0.0.0/0")
 		mergedInboundCIDRv6s.Insert("::/0")
 	}
-	if mergedProtocol == elbv2model.ProtocolHTTPS && mergedSSLPolicy == nil {
-		mergedSSLPolicy = awssdk.String(t.defaultSSLPolicy)
-	}
+	//if mergedProtocol == elbv2model.ProtocolHTTPS && mergedSSLPolicy == nil {
+	//	mergedSSLPolicy = awssdk.String(t.defaultSSLPolicy)
+	//}
 
 	return listenPortConfig{
 		protocol:             mergedProtocol,
 		inboundCIDRv4s:       mergedInboundCIDRv4s.List(),
 		inboundCIDRv6s:       mergedInboundCIDRv6s.List(),
 		prefixLists:          mergedInboundPrefixLists.List(),
-		sslPolicy:            mergedSSLPolicy,
+		//sslPolicy:            mergedSSLPolicy,
 		tlsCerts:             mergedTLSCerts,
 		mutualAuthentication: mergedMtlsAttributes,
 	}, nil

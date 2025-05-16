@@ -64,11 +64,12 @@ func (t *defaultModelBuildTask) buildListenerSpec(ctx context.Context, port core
 	if err != nil {
 		return elbv2model.ListenerSpec{}, err
 	}
-
-	var sslPolicy *string
+	
+	// Our ELB doesnt support sslPolicy configuration, turn off this
+	//var sslPolicy *string
 	var certificates []elbv2model.Certificate
 	if listenerProtocol == elbv2model.ProtocolTLS {
-		sslPolicy = cfg.sslPolicy
+		//sslPolicy = cfg.sslPolicy
 		certificates = cfg.certificates
 	}
 
@@ -78,7 +79,7 @@ func (t *defaultModelBuildTask) buildListenerSpec(ctx context.Context, port core
 		Port:            int64(port.Port),
 		Protocol:        listenerProtocol,
 		Certificates:    certificates,
-		SSLPolicy:       sslPolicy,
+		//SSLPolicy:       sslPolicy,
 		ALPNPolicy:      alpnPolicy,
 		DefaultActions:  defaultActions,
 		Tags:            tags,
@@ -187,7 +188,7 @@ func (t *defaultModelBuildTask) buildListenerALPNPolicy(ctx context.Context, lis
 type listenerConfig struct {
 	certificates    []elbv2model.Certificate
 	tlsPortsSet     sets.String
-	sslPolicy       *string
+	//sslPolicy       *string
 	backendProtocol string
 }
 
@@ -199,12 +200,12 @@ func (t *defaultModelBuildTask) buildListenerConfig(ctx context.Context) (*liste
 	}
 
 	backendProtocol := t.buildBackendProtocol(ctx)
-	sslPolicy := t.buildSSLNegotiationPolicy(ctx)
+	//sslPolicy := t.buildSSLNegotiationPolicy(ctx)
 
 	return &listenerConfig{
 		certificates:    certificates,
 		tlsPortsSet:     tlsPortsSet,
-		sslPolicy:       sslPolicy,
+		//sslPolicy:       sslPolicy,
 		backendProtocol: backendProtocol,
 	}, nil
 }

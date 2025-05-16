@@ -27,7 +27,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 				lsSpec: elbv2model.ListenerSpec{
 					Port:       80,
 					Protocol:   elbv2model.ProtocolHTTPS,
-					SSLPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+					//SSLPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 					ALPNPolicy: []string{"HTTP2Preferred"},
 				},
 				sdkLS: ListenerWithTags{
@@ -48,7 +48,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 								},
 							},
 						},
-						SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+						//SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 						AlpnPolicy: awssdk.StringSlice([]string{"HTTP2Preferred"}),
 						MutualAuthentication: &elbv2sdk.MutualAuthenticationAttributes{
 							Mode: awssdk.String("off"),
@@ -80,7 +80,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 				lsSpec: elbv2model.ListenerSpec{
 					Port:       80,
 					Protocol:   elbv2model.ProtocolHTTPS,
-					SSLPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+					//SSLPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 					ALPNPolicy: []string{"HTTP2Preferred"},
 					Certificates: []elbv2model.Certificate{
 						{
@@ -109,7 +109,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 								},
 							},
 						},
-						SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+						//SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 						AlpnPolicy: awssdk.StringSlice([]string{"HTTP2Preferred"}),
 						MutualAuthentication: &elbv2sdk.MutualAuthenticationAttributes{
 							Mode: awssdk.String("off"),
@@ -141,7 +141,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 				lsSpec: elbv2model.ListenerSpec{
 					Port:      80,
 					Protocol:  elbv2model.ProtocolHTTPS,
-					SSLPolicy: awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+					//: awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 				},
 				sdkLS: ListenerWithTags{
 					Listener: &elbv2sdk.Listener{
@@ -165,7 +165,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 								},
 							},
 						},
-						SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+						//SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 						AlpnPolicy: awssdk.StringSlice([]string{"HTTP2Preferred"}),
 						MutualAuthentication: &elbv2sdk.MutualAuthenticationAttributes{
 							Mode: awssdk.String("off"),
@@ -201,7 +201,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 				lsSpec: elbv2model.ListenerSpec{
 					Port:      80,
 					Protocol:  elbv2model.ProtocolHTTPS,
-					SSLPolicy: awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+					//SSLPolicy: awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 					MutualAuthentication: &elbv2model.MutualAuthenticationAttributes{
 						Mode:          "verify",
 						TrustStoreArn: awssdk.String("arn:aws:elasticloadbalancing:us-east-1:123456789123:truststore/ts-1/8786hghf"),
@@ -229,7 +229,7 @@ func Test_isSDKListenerSettingsDrifted(t *testing.T) {
 								},
 							},
 						},
-						SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
+						//SslPolicy:  awssdk.String("ELBSecurityPolicy-FS-1-2-Res-2019-08"),
 						AlpnPolicy: awssdk.StringSlice([]string{"HTTP2Preferred"}),
 						MutualAuthentication: &elbv2sdk.MutualAuthenticationAttributes{
 							Mode:                          awssdk.String("verify"),

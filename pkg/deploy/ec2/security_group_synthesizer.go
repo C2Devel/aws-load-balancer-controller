@@ -3,7 +3,7 @@ package ec2
 import (
 	"context"
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
+	//"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/aws/services"
 	"sigs.k8s.io/aws-load-balancer-controller/pkg/deploy/tracking"
@@ -72,11 +72,12 @@ func (s *securityGroupSynthesizer) Synthesize(ctx context.Context) error {
 }
 
 func (s *securityGroupSynthesizer) PostSynthesize(ctx context.Context) error {
-	for _, sdkSG := range s.unmatchedSDKSGs {
-		if err := s.sgManager.Delete(ctx, sdkSG); err != nil {
-			return err
-		}
-	}
+	// Disable deletion of sg, because this also can delete the sg of another, already existed balancer of current cluster
+	//for _, sdkSG := range s.unmatchedSDKSGs {
+	// 	if err := s.sgManager.Delete(ctx, sdkSG); err != nil {
+	// 		return err
+	// 	}
+	//}
 	return nil
 }
 
@@ -140,11 +141,11 @@ func mapResSecurityGroupByResourceID(resSGs []*ec2model.SecurityGroup) map[strin
 func mapSDKSecurityGroupByResourceID(sdkSGs []networking.SecurityGroupInfo, resourceIDTagKey string) (map[string][]networking.SecurityGroupInfo, error) {
 	sdkSGsByID := make(map[string][]networking.SecurityGroupInfo, len(sdkSGs))
 	for _, sdkSG := range sdkSGs {
-		resourceID, ok := sdkSG.Tags[resourceIDTagKey]
-		if !ok {
-			return nil, errors.Errorf("unexpected securityGroup with no resourceID: %v", sdkSG.SecurityGroupID)
-		}
+		resourceID := sdkSG.Tags[resourceIDTagKey]
+		// remove this condition because we can have multiple sgs on one vpc(for nlb/alb use)
+		//if  !ok {
 		sdkSGsByID[resourceID] = append(sdkSGsByID[resourceID], sdkSG)
+		//}
 	}
 	return sdkSGsByID, nil
 }
