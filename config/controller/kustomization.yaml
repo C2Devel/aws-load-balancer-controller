@@ -1,6 +1,7 @@
 resources:
 - controller.yaml
 - pod_disruption_budget.yaml
+- ingress_class.yaml
 patchesStrategicMerge:
 - iam_for_sa_patch.yaml
 - security_context_patch.yaml
