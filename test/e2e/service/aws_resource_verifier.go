@@ -225,9 +225,10 @@ func waitUntilTargetsAreHealthy(ctx context.Context, f *framework.Framework, lbA
 	return nil
 }
 
-func waitUntilBalancerGetDnsName(s *NLBInstanceTestStack) (dnsName string) {
+func waitUntilBalancerGetDnsName(ctx context.Context, f *framework.Framework, name string) ( dnsName string) {
 	Eventually(func(g Gomega) {
-		dnsName := s.GetLoadBalancerIngressHostName()
+		dnsName, err := f.LBManager.FindLoadBalancerByName(ctx, name)
+		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(dnsName).ShouldNot(BeEmpty())
 	}, utils.PollTimeoutShort, utils.PollIntervalMedium).Should(Succeed())
 	return dnsName
