@@ -40,7 +40,7 @@ var _ = Describe("test k8s service reconciled by the aws load balancer controlle
 			})
 
 			By("checking service status for lb dns name", func() {
-				dnsName = stack.GetLoadBalancerIngressHostName()
+				dnsName = waitUntilBalancerGetDnsName(&stack)
 				Expect(dnsName).ToNot(BeEmpty())
 			})
 
@@ -90,7 +90,7 @@ var _ = Describe("test k8s service reconciled by the aws load balancer controlle
 				Expect(err).NotTo(HaveOccurred())
 			})
 			By("checking service status for lb dns name", func() {
-				dnsName = stack.GetLoadBalancerIngressHostName()
+				dnsName = waitUntilBalancerGetDnsName(&stack)
 				Expect(dnsName).ToNot(BeEmpty())
 			})
 
@@ -211,7 +211,7 @@ var _ = Describe("test k8s service reconciled by the aws load balancer controlle
 				annotation["service.beta.kubernetes.io/aws-load-balancer-proxy-protocol"] = "*"
 				err := stack.Deploy(ctx, tf, annotation)
 				Expect(err).ToNot(HaveOccurred())
-				dnsName = stack.GetLoadBalancerIngressHostName()
+				dnsName = waitUntilBalancerGetDnsName(&stack)
 				Expect(dnsName).ToNot(BeEmpty())
 				lbARN, err = tf.LBManager.FindLoadBalancerByDNSName(ctx, dnsName)
 				Expect(err).NotTo(HaveOccurred())
@@ -254,7 +254,7 @@ var _ = Describe("test k8s service reconciled by the aws load balancer controlle
 				annotation["service.beta.kubernetes.io/aws-load-balancer-target-node-labels"] = "service.node.label/key1=value1"
 				err := stack.Deploy(ctx, tf, annotation)
 				Expect(err).ToNot(HaveOccurred())
-				dnsName = stack.GetLoadBalancerIngressHostName()
+				dnsName = waitUntilBalancerGetDnsName(&stack)
 				Expect(dnsName).ToNot(BeEmpty())
 				lbARN, err = tf.LBManager.FindLoadBalancerByDNSName(ctx, dnsName)
 				Expect(err).NotTo(HaveOccurred())
