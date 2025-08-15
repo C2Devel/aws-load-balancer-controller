@@ -2,6 +2,8 @@ package aws
 
 import (
 	"context"
+	"strings"
+
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	elbv2sdk "github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/go-logr/logr"
@@ -11,6 +13,7 @@ import (
 
 // LoadBalancerManager is responsible for LoadBalancer resources.
 type LoadBalancerManager interface {
+	FindLoadBalancerByName(ctx context.Context, name string) (string, error)
 	FindLoadBalancerByDNSName(ctx context.Context, dnsName string) (string, error)
 	WaitUntilLoadBalancerAvailable(ctx context.Context, lbARN string) error
 	GetLoadBalancerFromARN(ctx context.Context, lbARN string) (*elbv2sdk.LoadBalancer, error)
@@ -49,6 +52,20 @@ func (m *defaultLoadBalancerManager) FindLoadBalancerByDNSName(ctx context.Conte
 		}
 	}
 	return "", errors.Errorf("couldn't find LoadBalancer with dnsName: %v", dnsName)
+}
+
+func (m *defaultLoadBalancerManager) FindLoadBalancerByName(ctx context.Context, name string) (string, error) {
+	req := &elbv2sdk.DescribeLoadBalancersInput{}
+	lbs, err := m.elbv2Client.DescribeLoadBalancersAsList(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	for _, lb := range lbs {
+		if strings.Contains(awssdk.StringValue(lb.LoadBalancerName), name) {
+			return awssdk.StringValue(lb.DNSName), nil
+		}
+	}
+	return "", errors.Errorf("couldn't find LoadBalancer with name: %v", name)
 }
 
 func (m *defaultLoadBalancerManager) WaitUntilLoadBalancerAvailable(ctx context.Context, lbARN string) error {
