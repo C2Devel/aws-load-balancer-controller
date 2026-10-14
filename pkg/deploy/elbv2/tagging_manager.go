@@ -238,22 +238,15 @@ func (m *defaultTaggingManager) ListListenerRules(ctx context.Context, lsARN str
 		lrARNs = append(lrARNs, lrARN)
 		lrByARN[lrARN] = rule
 	}
-	var tagsByARN map[string]map[string]string
-	if m.featureGates.Enabled(config.ListenerRulesTagging) {
-		tagsByARN, err = m.describeResourceTags(ctx, lrARNs)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// NOTE: K2 Cloud doesn't support tags on listener rules (DescribeTags rejects rule ARNs),
+	// so the rules are returned without tags regardless of the ListenerRulesTagging feature gate.
 	var sdkLRs []ListenerRuleWithTags
 	for _, arn := range lrARNs {
-		tags := tagsByARN[arn]
 		sdkLRs = append(sdkLRs, ListenerRuleWithTags{
 			ListenerRule: lrByARN[arn],
-			Tags:         tags,
 		})
 	}
-	return sdkLRs, err
+	return sdkLRs, nil
 }
 
 // TODO: we can refactor this by store provisioned LB's ARN as annotations on Ingress/Service, thus avoid this heavy lookup calls when RGT is not available.
